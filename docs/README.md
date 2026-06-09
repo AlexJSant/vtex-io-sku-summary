@@ -307,20 +307,6 @@ To apply CSS customizations, follow [Using CSS handles for store customization](
 
 ---
 
-## Local development
-
-```bash
-# Link the app to a VTEX workspace
-vtex link
-
-# Install react dependencies (for local lint/type-check)
-cd react && yarn install
-```
-
-Ensure the target workspace account matches the `vendor` in `manifest.json` (`{appVendor}`).
-
----
-
 ## Related documentation
 
 - [BLOCKS.md](./BLOCKS.md) — quick reference for blocks and props
@@ -337,16 +323,6 @@ Thanks goes to these wonderful people:
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/gustavopvasconcellos"><img src="https://avatars1.githubusercontent.com/u/49173685?v=4" width="100px;" alt=""/><br /><sub><b>gustavopvasconcellos</b></sub></a><br /><a href="https://github.com/vtex-apps/product-summary/commits?author=gustavopvasconcellos" title="Code">💻</a></td>
-    <td align="center"><a href="http://imdanielpiva.me"><img src="https://avatars0.githubusercontent.com/u/26178791?v=4" width="100px;" alt=""/><br /><sub><b>Daniel Piva</b></sub></a><br /><a href="https://github.com/vtex-apps/product-summary/commits?author=imdanielpiva" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/vtex-apps"><img src="https://avatars.githubusercontent.com/u/12385684?v=4" width="100px;" alt=""/><br /><sub><b>VTEX Apps</b></sub></a><br /><a href="https://github.com/vtex-apps/product-summary" title="Code">💻</a></td>
-    <td align="center"><a href="https://{appVendor}.com.br"><img src="https://avatars.githubusercontent.com/u/12385684?v=4" width="100px;" alt=""/><br /><sub><b>{appVendor} Team</b></sub></a><br /><a href="#customization-{appVendor}" title="Customization">🎨</a></td>
-    <td align="center"><a href="https://github.com/vtex-apps/store-discussion"><img src="https://avatars.githubusercontent.com/u/12385684?v=4" width="100px;" alt=""/><br /><sub><b>Store Discussion</b></sub></a><br /><a href="https://github.com/vtex-apps/store-discussion" title="Documentation">📖</a></td>
-  </tr>
-</table>
-
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->
