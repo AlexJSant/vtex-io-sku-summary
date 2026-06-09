@@ -1,0 +1,113 @@
+query productById($productId: ID!, $itemsFilter: ItemsFilter) {
+  productsByIdentifier(field: id, values: [$productId])
+    @context(provider: "vtex.search-graphql") {
+    cacheId
+    productId
+    productName
+    productReference
+    linkText
+    link
+    brand
+    brandId
+    categoryId
+    categories
+    description
+    releaseDate
+    priceRange {
+      sellingPrice {
+        highPrice
+        lowPrice
+      }
+      listPrice {
+        highPrice
+        lowPrice
+      }
+    }
+    productClusters {
+      id
+      name
+    }
+    clusterHighlights {
+      id
+      name
+    }
+    specificationGroups {
+      name
+      originalName
+      specifications {
+        name
+        originalName
+        values
+      }
+    }
+    skuSpecifications {
+      field {
+        name
+        originalName
+      }
+      values {
+        name
+        originalName
+      }
+    }
+    properties {
+      name
+      values
+    }
+    items(filter: $itemsFilter) {
+      itemId
+      name
+      nameComplete
+      complementName
+      ean
+      variations {
+        name
+        values
+      }
+      referenceId {
+        Key
+        Value
+      }
+      measurementUnit
+      unitMultiplier
+      images {
+        cacheId
+        imageId
+        imageLabel
+        imageTag
+        imageUrl
+        imageText
+      }
+      sellers {
+        sellerId
+        sellerName
+        sellerDefault
+        commertialOffer {
+          Price
+          ListPrice
+          Tax
+          taxPercentage
+          spotPrice
+          PriceWithoutDiscount
+          RewardValue
+          PriceValidUntil
+          AvailableQuantity
+          Installments {
+            Value
+            InterestRate
+            TotalValuePlusInterestRate
+            NumberOfInstallments
+            PaymentSystemName
+            PaymentSystemGroupName
+            Name
+          }
+        }
+      }
+      attachments {
+        id
+        name
+        required
+      }
+    }
+  }
+}

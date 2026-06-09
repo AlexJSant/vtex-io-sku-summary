@@ -1,0 +1,17 @@
+{
+  "sku-summary-list": {
+    "blocks": ["sku-summary.shelf"]
+  },
+  "sku-summary.shelf": {
+    "children": [
+      "sku-summary-image",
+      "sku-summary-name",
+      "sku-summary-attachment-list",
+      "sku-summary-space",
+      "sku-summary-column#1"
+    ]
+  },
+  "sku-summary-column#1": {
+    "children": ["sku-summary-price", "sku-summary-buy-button"]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "projectName": "product-summary",
+  "projectOwner": "vtex-apps",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "docs/README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "none",
+  "contributors": [
+    {
+      "login": "gustavopvasconcellos",
+      "name": "gustavopvasconcellos",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/49173685?v=4",
+      "profile": "https://github.com/gustavopvasconcellos",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "imdanielpiva",
+      "name": "Daniel Piva",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/26178791?v=4",
+      "profile": "http://imdanielpiva.me",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true
+}

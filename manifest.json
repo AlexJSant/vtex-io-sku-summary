@@ -1,0 +1,30 @@
+{
+  "vendor": "sunhouse",
+  "name": "sku-summary",
+  "version": "0.1.0",
+  "title": "SKU Summary",
+  "description": "Lists product SKUs as individual cards - based on the original VTEX app Product Summary",
+  "defaultLocale": "pt-BR",
+  "builders": {
+    "messages": "1.x",
+    "store": "0.x",
+    "react": "3.x"
+  },
+  "dependencies": {
+    "vtex.native-types": "0.x",
+    "vtex.store-components": "3.x",
+    "vtex.store-resources": "0.x",
+    "vtex.product-summary-context": "0.x",
+    "vtex.styleguide": "9.x",
+    "vtex.pixel-manager": "1.x",
+    "vtex.device-detector": "0.x",
+    "vtex.responsive-values": "0.x",
+    "vtex.css-handles": "1.x",
+    "vtex.product-context": "0.x",
+    "vtex.list-context": "0.x",
+    "vtex.product-list-context": "0.x",
+    "vtex.on-view": "1.x",
+    "vtex.search-graphql": "0.x"
+  },
+  "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
+}

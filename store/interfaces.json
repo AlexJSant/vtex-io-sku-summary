@@ -1,0 +1,71 @@
+{
+  "sku-summary-list": {
+    "component": "SkuSummaryList",
+    "content": {
+      "$ref": "app:sunhouse.sku-summary#/definitions/SkuSummaryList"
+    },
+    "composition": "children",
+    "allowed": ["sku-summary"],
+    "preview": {
+      "type": "grid",
+      "height": 550
+    }
+  },
+  "sku-summary": {
+    "component": "SkuSummaryCustom",
+    "composition": "children"
+  },
+  "sku-summary.shelf": {
+    "component": "SkuSummaryCustom",
+    "composition": "children"
+  },
+  "sku-summary-column": {
+    "component": "Column",
+    "composition": "children"
+  },
+  "sku-summary-space": {
+    "component": "Spacer"
+  },
+  "sku-summary-attachment-list": {
+    "component": "SkuSummaryAttachmentList"
+  },
+  "sku-summary-buy-button": {
+    "component": "SkuSummaryBuyButton",
+    "content": {
+      "properties": {
+        "buyButtonText": {
+          "$ref": "app:sunhouse.sku-summary#/definitions/ProductSummary/properties/buyButtonText"
+        }
+      }
+    }
+  },
+  "sku-summary-image": {
+    "component": "SkuSummaryImage",
+    "content": {
+      "properties": {
+        "badgeText": {
+          "$ref": "app:sunhouse.sku-summary#/definitions/ProductSummary/properties/badgeText"
+        }
+      }
+    }
+  },
+  "sku-summary-name": {
+    "component": "SkuSummaryName"
+  },
+  "sku-summary-sku-name": {
+    "component": "SkuSummarySKUName"
+  },
+  "sku-summary-price": {
+    "component": "SkuSummaryPrice",
+    "content": {
+      "properties": {
+        "labelSellingPrice": {
+          "$ref": "app:sunhouse.sku-summary#/definitions/ProductSummary/properties/labelSellingPrice"
+        },
+        "labelListPrice": {
+          "$ref": "app:sunhouse.sku-summary#/definitions/ProductSummary/properties/labelListPrice"
+        }
+      }
+    }
+  }
+}

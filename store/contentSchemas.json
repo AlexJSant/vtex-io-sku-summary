@@ -1,0 +1,57 @@
+{
+  "definitions": {
+    "ProductSummary": {
+      "properties": {
+        "badgeText": {
+          "title": "admin/editor.productSummary.badgeText.title",
+          "$ref": "app:vtex.native-types#/definitions/text"
+        },
+        "buyButtonText": {
+          "title": "admin/editor.productSummary.buyButtonText.title",
+          "$ref": "app:vtex.native-types#/definitions/text",
+          "default": "store/button-label"
+        },
+        "labelSellingPrice": {
+          "title": "admin/editor.productSummaryPrice.labelSellingPrice.title",
+          "$ref": "app:vtex.native-types#/definitions/text",
+          "default": "store/pricing.to"
+        },
+        "labelListPrice": {
+          "title": "admin/editor.productSummaryPrice.labelListPrice.title",
+          "$ref": "app:vtex.native-types#/definitions/text",
+          "default": "store/pricing.from"
+        },
+        "trackListName": {
+          "title": "admin/editor.productSummary.trackListName.title",
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "SkuSummaryList": {
+      "properties": {
+        "productId": {
+          "title": "admin/editor.skuSummaryList.productId.title",
+          "type": "string"
+        },
+        "listName": {
+          "title": "admin/editor.skuSummaryList.listName.title",
+          "type": "string",
+          "default": "SKU list"
+        },
+        "itemsFilter": {
+          "title": "admin/editor.skuSummaryList.itemsFilter.title",
+          "type": "string",
+          "enum": ["ALL", "FIRST_AVAILABLE", "ALL_AVAILABLE"],
+          "default": "ALL_AVAILABLE"
+        },
+        "maxItems": {
+          "title": "admin/editor.skuSummaryList.maxItems.title",
+          "description": "admin/editor.skuSummaryList.maxItems.description",
+          "type": "number",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}
