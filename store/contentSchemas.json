@@ -28,11 +28,52 @@
         }
       }
     },
+    "ManualSkus": {
+      "type": "array",
+      "title": "admin/editor.skuSummaryList.skus.title",
+      "description": "admin/editor.skuSummaryList.skus.description",
+      "items": {
+        "type": "object",
+        "title": "admin/editor.skuSummaryList.skus.item.title",
+        "properties": {
+          "__editorItemTitle": {
+            "title": "admin/editor.skuSummaryList.skus.item.editorTitle",
+            "type": "string"
+          },
+          "skuId": {
+            "title": "admin/editor.skuSummaryList.skus.item.skuId.title",
+            "description": "admin/editor.skuSummaryList.skus.item.skuId.description",
+            "type": "string"
+          }
+        }
+      }
+    },
     "SkuSummaryList": {
       "properties": {
         "productId": {
           "title": "admin/editor.skuSummaryList.productId.title",
+          "description": "admin/editor.skuSummaryList.productId.description",
           "type": "string"
+        },
+        "skus": {
+          "type": "array",
+          "title": "admin/editor.skuSummaryList.skus.title",
+          "description": "admin/editor.skuSummaryList.skus.description",
+          "items": {
+            "type": "object",
+            "title": "admin/editor.skuSummaryList.skus.item.title",
+            "properties": {
+              "__editorItemTitle": {
+                "title": "admin/editor.skuSummaryList.skus.item.editorTitle",
+                "type": "string"
+              },
+              "skuId": {
+                "title": "admin/editor.skuSummaryList.skus.item.skuId.title",
+                "description": "admin/editor.skuSummaryList.skus.item.skuId.description",
+                "type": "string"
+              }
+            }
+          }
         },
         "listName": {
           "title": "admin/editor.skuSummaryList.listName.title",
@@ -41,6 +82,7 @@
         },
         "itemsFilter": {
           "title": "admin/editor.skuSummaryList.itemsFilter.title",
+          "description": "admin/editor.skuSummaryList.itemsFilter.description",
           "type": "string",
           "enum": ["ALL", "FIRST_AVAILABLE", "ALL_AVAILABLE"],
           "default": "ALL_AVAILABLE"

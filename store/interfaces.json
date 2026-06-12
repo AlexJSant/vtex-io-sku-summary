@@ -2,7 +2,34 @@
   "sku-summary-list": {
     "component": "SkuSummaryList",
     "content": {
-      "$ref": "app:sunhouse.sku-summary#/definitions/SkuSummaryList"
+      "properties": {
+        "productId": {
+          "title": "admin/editor.skuSummaryList.productId.title",
+          "description": "admin/editor.skuSummaryList.productId.description",
+          "type": "string"
+        },
+        "skus": {
+          "$ref": "app:sunhouse.sku-summary#/definitions/ManualSkus"
+        },
+        "listName": {
+          "title": "admin/editor.skuSummaryList.listName.title",
+          "type": "string",
+          "default": "SKU list"
+        },
+        "itemsFilter": {
+          "title": "admin/editor.skuSummaryList.itemsFilter.title",
+          "description": "admin/editor.skuSummaryList.itemsFilter.description",
+          "type": "string",
+          "enum": ["ALL", "FIRST_AVAILABLE", "ALL_AVAILABLE"],
+          "default": "ALL_AVAILABLE"
+        },
+        "maxItems": {
+          "title": "admin/editor.skuSummaryList.maxItems.title",
+          "description": "admin/editor.skuSummaryList.maxItems.description",
+          "type": "number",
+          "minimum": 1
+        }
+      }
     },
     "composition": "children",
     "allowed": ["sku-summary"],

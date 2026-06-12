@@ -206,7 +206,8 @@ export const adminMessages = defineMessages({
   },
   skuSummaryListDescription: {
     id: 'admin/editor.skuSummaryList.description',
-    defaultMessage: 'Lists all SKUs of a product as individual cards',
+    defaultMessage:
+      'Lists SKUs as individual cards from a product ID or a manual selection',
   },
   skuSummaryListProductIdTitle: {
     id: 'admin/editor.skuSummaryList.productId.title',
@@ -214,7 +215,33 @@ export const adminMessages = defineMessages({
   },
   skuSummaryListProductIdDescription: {
     id: 'admin/editor.skuSummaryList.productId.description',
-    defaultMessage: 'Catalog product ID whose SKUs will be listed',
+    defaultMessage:
+      'Catalog product ID whose SKUs will be listed. Ignored when SKUs are added manually below.',
+  },
+  skuSummaryListSkusTitle: {
+    id: 'admin/editor.skuSummaryList.skus.title',
+    defaultMessage: 'SKUs',
+  },
+  skuSummaryListSkusDescription: {
+    id: 'admin/editor.skuSummaryList.skus.description',
+    defaultMessage:
+      'Add SKUs one by one. When this list has items, the Product ID field is ignored.',
+  },
+  skuSummaryListSkusItemTitle: {
+    id: 'admin/editor.skuSummaryList.skus.item.title',
+    defaultMessage: 'SKU',
+  },
+  skuSummaryListSkusItemEditorTitle: {
+    id: 'admin/editor.skuSummaryList.skus.item.editorTitle',
+    defaultMessage: 'Card label (Site Editor only)',
+  },
+  skuSummaryListSkusItemSkuIdTitle: {
+    id: 'admin/editor.skuSummaryList.skus.item.skuId.title',
+    defaultMessage: 'SKU ID',
+  },
+  skuSummaryListSkusItemSkuIdDescription: {
+    id: 'admin/editor.skuSummaryList.skus.item.skuId.description',
+    defaultMessage: 'Catalog SKU ID (itemId)',
   },
   skuSummaryListListNameTitle: {
     id: 'admin/editor.skuSummaryList.listName.title',
@@ -223,6 +250,11 @@ export const adminMessages = defineMessages({
   skuSummaryListItemsFilterTitle: {
     id: 'admin/editor.skuSummaryList.itemsFilter.title',
     defaultMessage: 'SKU filter',
+  },
+  skuSummaryListItemsFilterDescription: {
+    id: 'admin/editor.skuSummaryList.itemsFilter.description',
+    defaultMessage:
+      'Applied only when using Product ID. Ignored when SKUs are added manually.',
   },
   skuSummaryListItemsFilterAll: {
     id: 'admin/editor.skuSummaryList.itemsFilter.all',
@@ -243,6 +275,6 @@ export const adminMessages = defineMessages({
   skuSummaryListMaxItemsDescription: {
     id: 'admin/editor.skuSummaryList.maxItems.description',
     defaultMessage:
-      "Limits how many SKU cards appear on the shelf, regardless of the product's total SKU count",
+      "Limits how many SKU cards appear when using Product ID. Ignored when SKUs are added manually.",
   },
 })

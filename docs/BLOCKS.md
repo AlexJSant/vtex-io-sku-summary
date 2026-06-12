@@ -18,6 +18,17 @@
     "blocks": ["sku-summary.shelf"]
   },
 
+  "sku-summary-list#manual-picks": {
+    "props": {
+      "listName": "Curated variations",
+      "skus": [
+        { "skuId": "76907" },
+        { "skuId": "76908" }
+      ]
+    },
+    "blocks": ["sku-summary.shelf"]
+  },
+
   "sku-summary.shelf": {
     "props": {
       "priceBehavior": "asyncOnly1P",

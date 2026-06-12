@@ -54,7 +54,7 @@ productId → GraphQL (productsByIdentifier) → product.items[]
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `productId` | `string` | — | Catalog product ID |
-| `listName` | `string` | `"SKU list"` | Analytics list name |
+| `listName` | `string` | `"SKU list"` | Optional analytics list name |
 | `itemsFilter` | `ALL` \| `FIRST_AVAILABLE` \| `ALL_AVAILABLE` | `ALL_AVAILABLE` | SKU filter for GraphQL |
 | `maxItems` | `number` | — | Optional cap on displayed SKU cards |
 
@@ -440,10 +440,100 @@ All exported interfaces use the `sku-summary-*` prefix to coexist with `vtex.pro
 
 ---
 
+## 📅 Date: 12/06/2026
+
+### Manual SKU selection (`skus` array)
+
+**Goal:** Allow merchants to pick SKUs one by one in the Site Editor (array UI like `list-context.image-list`), overriding automatic listing by `productId`.
+
+**Behavior:**
+
+| Mode | Trigger | `productId` | `itemsFilter` | `maxItems` |
+|------|---------|-------------|---------------|------------|
+| Manual | `skus` has ≥1 valid `skuId` | Ignored | Ignored | Ignored |
+| Automatic | `skus` empty + `productId` set | Used | Used | Used |
+
+**Multiple SKUs from the same product:** `expandManualSkusToProductCards()` builds an `itemId → product` lookup from the batch GraphQL response, then walks the editor array in order — each `skuId` produces its own card even when the API returns a single product entry.
+
+**Files changed:**
+
+| File | Change |
+|------|--------|
+| `store/contentSchemas.json` | `ManualSkus` array definition + `skus` on `SkuSummaryList` |
+| `react/queries/productsBySkuIds.gql` | `productsByIdentifier(field: sku, values: $skuIds)` |
+| `react/utils/expandSkusToProducts.ts` | `expandManualSkusToProductCards()` + shared `buildVirtualProductCard` |
+| `react/SkuSummaryList.tsx` | Dual-mode fetch and schema |
+| `store/interfaces.json` | Direct `$ref` to `ManualSkus` in `content.properties` (Site Editor runtime binding) |
+| `react/messages.ts` + `messages/*.json` | Site Editor labels (pt-BR / en) |
+
+**Status:** ✅ Implemented — QA in progress (see checklist below)
+
+**Fix (12/06/2026):** Manual SKU list returned empty in Site Editor while GraphQL (`field: sku`) returned data. Cause: `interfaces.json` used a single `$ref` to `SkuSummaryList`, so the nested `skus` array was not bound to runtime props (same pattern as `list-context.image-list` → direct `$ref` to `ManualSkus` in `content.properties`). Also aligned `expandManualSkusToProductCards` to return raw catalog virtual products for single normalization in `SkuSummaryListWithoutQuery`.
+
+---
+
+### Site Editor — `listName` label (optional)
+
+**Goal:** Clarify in the Site Editor that `listName` is optional and used only for analytics.
+
+**Site Editor labels:**
+
+| Locale | Label |
+|--------|-------|
+| `pt-BR` | Nome da lista (analytics) - opcional |
+| `en` | List name (analytics) - optional |
+
+**Files changed:** `messages/en.json`, `messages/pt-BR.json`
+
+**Locales in this app:** `en`, `pt-BR`, plus developer context `messages/context.json` (not a storefront locale). See section 3.
+
+**Status:** ✅ Implemented
+
+---
+
+### ✅ QA checklist — manual SKU selection
+
+Use this list after `vtex link` on a workspace with the store theme.
+
+#### Site Editor
+
+- [x] Block **Lista de SKUs** shows the **SKUs** section with **+ ADICIONAR** button
+- [x] Each card exposes **ID do SKU** and optional **Rótulo do card**
+- [x] **ID do produto** description states it is ignored when manual SKUs exist
+- [x] **Filtro de SKUs** / **Quantidade máxima** descriptions state they apply only with Product ID
+- [ ] **Nome da lista (analytics) - opcional** appears for `listName`; leaving it empty uses default `"SKU list"`
+- [x] Saving and reopening the block preserves SKU order and values
+
+#### Modo automático (regressão)
+
+- [x] `productId` only (no manual SKUs) — shelf renders as before
+- [x] `itemsFilter: ALL_AVAILABLE` hides unavailable SKUs
+- [x] `maxItems: 4` caps cards when product has more SKUs
+- [x] Empty `productId` and empty `skus` — block does not render (no error)
+
+#### Modo manual
+
+- [ ] 1 SKU — one card with correct image, name, price, buy button
+- [x] 2+ SKUs from **different products** — one card per SKU, correct PDP link each (`?skuId=`)
+- [x] 2+ SKUs from the **same product** — one card per SKU (not deduplicated)
+- [x] Manual order in editor matches shelf left-to-right order
+- [ ] Invalid / empty `skuId` entry — skipped without breaking other cards
+- [x] `productId` + manual `skus` both filled — manual list wins; product SKUs not shown
+- [x] With manual SKUs set, changing `maxItems` or `itemsFilter` has **no effect**
+
+#### Storefront / integração
+
+- [ ] Cards work with theme `condition-layout` (no extension point crash)
+- [ ] Analytics list name still fires on impression/click
+- [ ] Up to ~10 manual SKUs — acceptable load time on target page
+
+---
+
 ## 🔄 Pending / TODO
 
-- [ ] **Publish app** — `vtex publish` after QA sign-off on `dev1`
-- [ ] **Theme dependency** — ensure all environments declare `"{appVendor}.sku-summary": "0.x"` in theme `manifest.json`
+- [ ] **QA manual SKU selection** — remaining items in checklist above (`listName` label, invalid `skuId`, storefront/integration)
+- [ ] **Publish app** — `vtex publish` after full QA sign-off on `dev1`
+- [x] **Theme dependency** — `sunhouse.sku-summary` declared in theme `manifest.json` across environments
 - [ ] **Large SKU lists (30+)** — `maxItems` covers simple shelf caps; evaluate pagination or virtualization if full lists are needed
 - [ ] **Price simulation** — if theme enables `priceBehavior: async` on shelf, monitor N parallel simulation requests
 - [ ] **Analytics validation** — confirm product impression/click events report SKU-level data correctly
@@ -465,7 +555,7 @@ All exported interfaces use the `sku-summary-*` prefix to coexist with `vtex.pro
 | Runtime blockers fixed | 3 (condition-layout crash, SKU link, name field visibility) |
 | Link format | `/{linkText}/p?skuId={itemId}` |
 | Visual parity | Preserved via `sku-summary.shelf` child blocks |
-| QA status | ✅ Rendering confirmed on `dev1--{appVendor}.myvtex.com` with store theme |
+| QA status | ✅ Manual + automatic modes validated on `dev1--sunhouse.myvtex.com` (storefront/integration pending) |
 
 ---
 

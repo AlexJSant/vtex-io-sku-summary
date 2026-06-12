@@ -6,22 +6,38 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-SKU Summary (`{appVendor}.sku-summary`) is a custom VTEX IO app that lists **all SKUs of a single product as independent shelf cards**. It is based on [vtex.product-summary](https://github.com/vtex-apps/product-summary), stripped down to the essentials and extended with a `productId`-driven data layer.
+SKU Summary (`sunhouse.sku-summary`) is a custom VTEX IO app that lists **SKUs as independent shelf cards**. It is based on [vtex.product-summary](https://github.com/vtex-apps/product-summary), stripped down to the essentials and extended with a flexible data layer driven by **Product ID** or a **manual SKU list** configured in the Site Editor.
 
 Unlike `list-context.product-list`, which renders one card per **product**, this app renders one card per **SKU** — each card locked to a single variation, with its own image, price, and PDP link (`?skuId=`).
 
 ## How it works
 
+**Automatic mode** (Product ID):
+
 ```
-productId → GraphQL (productsByIdentifier) → product.items[]
+productId → GraphQL (productsByIdentifier, field: id) → product.items[]
   → expandSkusToProductCards() → SkuSummaryListWithoutQuery
   → sku-summary.shelf + child blocks
 ```
 
-- **One GraphQL request** fetches the product and all SKUs.
+**Manual mode** (Site Editor SKU array — overrides Product ID):
+
+```
+skus[].skuId → GraphQL (productsByIdentifier, field: sku) → match items by ID
+  → expandManualSkusToProductCards() → SkuSummaryListWithoutQuery
+  → sku-summary.shelf + child blocks
+```
+
+| Mode | Trigger | `productId` | `itemsFilter` | `maxItems` |
+|------|---------|-------------|---------------|------------|
+| Manual | `skus` has ≥1 valid `skuId` | Ignored | Ignored | Ignored |
+| Automatic | `skus` empty + `productId` set | Used | Used | Used |
+
+- **One GraphQL request** per list (by product ID or batch SKU IDs).
 - Each SKU is expanded into a virtual product object (`items: [sku]`) and normalized for `product-summary-context`.
 - Cards reuse the same visual composition as product-summary shelves (image, name, price, buy button, etc.).
 - Card links point to the PDP with the SKU pre-selected: `/{linkText}/p?skuId={itemId}`.
+- Manual lists preserve **editor order** and support multiple SKUs from the same product (one card per `skuId`).
 
 > For implementation history, build fixes, and pending work, see [DEVELOPMENT_LOG.md](./DEVELOPMENT_LOG.md).
 
@@ -31,12 +47,12 @@ productId → GraphQL (productsByIdentifier) → product.items[]
 
 ### 1. Add the app dependency
 
-Import `{appVendor}.sku-summary` in your theme `manifest.json`:
+Import `sunhouse.sku-summary` in your theme `manifest.json`:
 
 ```json
 {
   "dependencies": {
-    "{appVendor}.sku-summary": "0.x"
+    "sunhouse.sku-summary": "0.x"
   }
 }
 ```
@@ -45,7 +61,7 @@ Import `{appVendor}.sku-summary` in your theme `manifest.json`:
 
 | Block name | Description |
 | ---------- | ----------- |
-| `sku-summary-list` | **Mandatory** — Fetches a product by `productId`, expands SKUs into cards, and provides data to child shelf blocks via list context. |
+| `sku-summary-list` | **Mandatory** — Fetches SKUs by `productId` or a manual `skus` array, expands them into cards, and provides data to child shelf blocks via list context. |
 | `sku-summary.shelf` | **Mandatory** — Logical shelf wrapper. Compose child blocks below to define card layout. Alias: `sku-summary`. |
 | `sku-summary-image` | Renders the SKU image (discount badge, collection badges, hover image). |
 | `sku-summary-name` | Renders product name, brand, SKU name, and/or reference — each field toggled independently via `showFieldsProps`. |
@@ -62,10 +78,13 @@ Import `{appVendor}.sku-summary` in your theme `manifest.json`:
 
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
-| `productId` | `string` | — | Catalog product ID whose SKUs will be listed. |
-| `listName` | `string` | `"SKU list"` | List name sent to analytics events. |
-| `itemsFilter` | `ALL` \| `FIRST_AVAILABLE` \| `ALL_AVAILABLE` | `ALL_AVAILABLE` | Controls which SKUs are returned by GraphQL. |
-| `maxItems` | `number` | — | Optional cap on how many **SKU cards** appear on the shelf, regardless of the product's total SKU count. |
+| `productId` | `string` | — | Catalog product ID whose SKUs will be listed. **Ignored when `skus` has items.** |
+| `skus` | `{ skuId: string }[]` | — | Manual SKU list (Site Editor **+ ADICIONAR**). When non-empty, overrides `productId`. |
+| `listName` | `string` | `"SKU list"` | Optional. Name sent to analytics events (impressions, clicks, PDP attribution). |
+| `itemsFilter` | `ALL` \| `FIRST_AVAILABLE` \| `ALL_AVAILABLE` | `ALL_AVAILABLE` | Controls which SKUs GraphQL returns. **Only used with `productId`.** |
+| `maxItems` | `number` | — | Cap on **SKU cards** when using `productId`. **Ignored when `skus` has items.** |
+
+**Site Editor:** The `skus` array uses the same card-array pattern as [`list-context.image-list`](https://developers.vtex.com/docs/apps/vtex.store-image). Each entry has `skuId` (catalog item ID) and an optional editor label (`__editorItemTitle`).
 
 ### 4. `sku-summary-name` props
 
@@ -111,9 +130,11 @@ Configure visibility per field via `showFieldsProps`. All flags default to `fals
 
 ### 5. Basic `blocks.json` example
 
+**Automatic mode (Product ID):**
+
 ```json
 {
-  "{appVendor}.sku-summary-list#product-skus": {
+  "sunhouse.sku-summary-list#product-skus": {
     "props": {
       "productId": "123",
       "itemsFilter": "ALL_AVAILABLE",
@@ -122,7 +143,28 @@ Configure visibility per field via `showFieldsProps`. All flags default to `fals
     },
     "blocks": ["sku-summary.shelf"]
   },
+```
 
+**Manual mode (curated SKUs):**
+
+```json
+{
+  "sunhouse.sku-summary-list#curated-skus": {
+    "props": {
+      "listName": "Featured variations",
+      "skus": [
+        { "skuId": "76907" },
+        { "skuId": "76908" }
+      ]
+    },
+    "blocks": ["sku-summary.shelf"]
+  },
+```
+
+**Shelf composition (shared by both modes):**
+
+```json
+{
   "sku-summary.shelf#product-skus": {
     "children": [
       "sku-summary-image",
@@ -184,7 +226,7 @@ Use `children` to wrap the list in a responsive layout (slider, grid, etc.). `ma
 
 ```json
 {
-  "{appVendor}.sku-summary-list#ambient-showcase_shelf": {
+  "sunhouse.sku-summary-list#ambient-showcase_shelf": {
     "title": "Configurações da Lista de SKUs",
     "props": {
       "productId": "123",
@@ -221,7 +263,7 @@ https://{store-domain}/{linkText}/p?skuId={itemId}
 Example:
 
 ```
-https://dev1--{appVendor}.myvtex.com/rack-abra-ripado-cor-nature-3-gavetas-222cm---76907/p?skuId=76907
+https://dev1--sunhouse.myvtex.com/rack-abra-ripado-cor-nature-3-gavetas-222cm---76907/p?skuId=76907
 ```
 
 The VTEX `Link` component expects `query` as a **string** (not an object). The app passes `skuId={itemId}` when a selected SKU is available.
@@ -230,7 +272,7 @@ The VTEX `Link` component expects `query` as a **string** (not an object). The a
 
 ## Compatibility with theme blocks
 
-Because each card exposes a full product-shaped context, standard theme blocks that read product data (e.g. `{appVendor}.condition-layout`) work as child blocks of `sku-summary.shelf`.
+Because each card exposes a full product-shaped context, standard theme blocks that read product data (e.g. `sunhouse.condition-layout`) work as child blocks of `sku-summary.shelf`.
 
 The GraphQL query includes fields required by common theme integrations:
 
@@ -245,13 +287,15 @@ Virtual SKU cards also apply defensive defaults (`[]`) for array fields when the
 
 | Scenario | Behavior |
 | -------- | -------- |
-| GraphQL | 1 request per list (`productsByIdentifier`) |
+| GraphQL (automatic) | 1 request per list — `productsByIdentifier(field: id)` |
+| GraphQL (manual) | 1 batch request — `productsByIdentifier(field: sku)` |
 | Caching | `fetchPolicy: 'cache-first'` on Apollo |
 | SSR | Query runs client-side only (`ssr: false`) |
-| Default filter | `ALL_AVAILABLE` — skips unavailable SKUs |
+| Default filter | `ALL_AVAILABLE` — skips unavailable SKUs (automatic mode only) |
+| Manual lists | Typical use ≤10 SKUs; order matches Site Editor |
 | Price simulation | `priceBehavior: default` — no async simulation per card unless configured on the shelf |
 
-For products with **30+ SKUs**, consider using `maxItems` or implementing pagination in the theme.
+For products with **30+ SKUs** in automatic mode, use `maxItems` or pagination in the theme.
 
 ---
 
