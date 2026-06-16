@@ -1,7 +1,7 @@
 {
   "vendor": "sunhouse",
   "name": "sku-summary",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "title": "SKU Summary",
   "description": "Lists product SKUs as individual cards - based on the original VTEX app Product Summary",
   "defaultLocale": "pt-BR",
