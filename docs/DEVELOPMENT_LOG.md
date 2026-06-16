@@ -7,6 +7,7 @@ This document records the customizations, fixes, and improvements implemented in
 ## 📅 Date: 09/06/2026
 
 ### 🎯 Session Objectives
+
 - Transform a `vtex.product-summary` fork into a lean custom VTEX IO app that lists **SKUs as individual shelf cards**
 - Accept a `productId` prop and render one card per SKU while preserving the original product-summary visual pattern
 - Remove all non-essential code to keep the app performant and maintainable
@@ -41,24 +42,29 @@ productId → GraphQL (productsByIdentifier) → product.items[]
 
 **Files created:**
 
-| File | Purpose |
-|------|---------|
-| `react/SkuSummaryList.tsx` | Main list component — GraphQL fetch, SKU expansion, list rendering |
-| `react/SkuSummaryListWithoutQuery.tsx` | Static list renderer (no product search query) |
-| `react/utils/expandSkusToProducts.ts` | Maps each SKU to a virtual product with `items: [sku]` and unique `cacheId` |
-| `react/types.ts` | Shared `ProductClickParams` type |
-| `react/queries/productById.gql` | GraphQL query via `vtex.search-graphql` |
+
+| File                                   | Purpose                                                                     |
+| -------------------------------------- | --------------------------------------------------------------------------- |
+| `react/SkuSummaryList.tsx`             | Main list component — GraphQL fetch, SKU expansion, list rendering          |
+| `react/SkuSummaryListWithoutQuery.tsx` | Static list renderer (no product search query)                              |
+| `react/utils/expandSkusToProducts.ts`  | Maps each SKU to a virtual product with `items: [sku]` and unique `cacheId` |
+| `react/types.ts`                       | Shared `ProductClickParams` type                                            |
+| `react/queries/productById.gql`        | GraphQL query via `vtex.search-graphql`                                     |
+
 
 **Props exposed (Site Editor):**
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `productId` | `string` | — | Catalog product ID |
-| `listName` | `string` | `"SKU list"` | Optional analytics list name |
-| `itemsFilter` | `ALL` \| `FIRST_AVAILABLE` \| `ALL_AVAILABLE` | `ALL_AVAILABLE` | SKU filter for GraphQL |
-| `maxItems` | `number` | — | Optional cap on displayed SKU cards |
+
+| Prop          | Type     | Default           | Description                         |
+| ------------- | -------- | ----------------- | ----------------------------------- |
+| `productId`   | `string` | —                 | Catalog product ID                  |
+| `listName`    | `string` | `"SKU list"`      | Optional analytics list name        |
+| `itemsFilter` | `ALL`    | `FIRST_AVAILABLE` | `ALL_AVAILABLE`                     |
+| `maxItems`    | `number` | —                 | Optional cap on displayed SKU cards |
+
 
 **Performance choices:**
+
 - Single GraphQL request per list (`productsByIdentifier`)
 - `useMemo` for SKU → card expansion
 - `fetchPolicy: 'cache-first'` on Apollo query
@@ -75,15 +81,17 @@ productId → GraphQL (productsByIdentifier) → product.items[]
 
 **Files modified:**
 
-| File | Change |
-|------|--------|
-| `manifest.json` | Vendor `{appVendor}`, name `sku-summary`, v0.1.0; lean dependency set |
-| `store/interfaces.json` | `sku-summary-list`, `sku-summary`, `sku-summary.shelf`, and child blocks |
-| `store/blocks.json` | Default shelf composition (image, name, attachments, price, buy button) |
-| `store/contentSchemas.json` | Site Editor schema for `SkuSummaryList` and shelf blocks |
-| `react/messages.ts` + `messages/en.json`, `messages/pt-BR.json`, `messages/context.json` | i18n keys for Site Editor (see section 11) |
 
-**Block namespace:** All shelf blocks use the `sku-summary-*` prefix (e.g. `sku-summary-image`, `sku-summary-name`) to avoid interface conflicts with `vtex.product-summary` in the theme.
+| File                                                                                     | Change                                                                   |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `manifest.json`                                                                          | Vendor `{appVendor}`, name `sku-summary`, v0.1.0; lean dependency set    |
+| `store/interfaces.json`                                                                  | `sku-summary-list`, `sku-summary`, `sku-summary.shelf`, and child blocks |
+| `store/blocks.json`                                                                      | Default shelf composition (image, name, attachments, price, buy button)  |
+| `store/contentSchemas.json`                                                              | Site Editor schema for `SkuSummaryList` and shelf blocks                 |
+| `react/messages.ts` + `messages/en.json`, `messages/pt-BR.json`, `messages/context.json` | i18n keys for Site Editor (see section 11)                               |
+
+
+**Block namespace:** All shelf blocks use the `sku-summary-`* prefix (e.g. `sku-summary-image`, `sku-summary-name`) to avoid interface conflicts with `vtex.product-summary` in the theme.
 
 **Example theme usage:**
 
@@ -118,18 +126,20 @@ productId → GraphQL (productsByIdentifier) → product.items[]
 
 **Removed:**
 
-| Category | Items |
-|----------|-------|
-| Product listing | `ProductSummaryList.tsx`, `list-context.product-list`, `list-context.product-list-static` |
-| Legacy | `ProductSummaryLegacy`, `react/legacy/` |
-| Unused blocks | SKU selector, specification badges, add-to-list, brand, description |
-| Tests/mocks | `__tests__/`, `__mocks__/` |
-| Docs | `CHANGELOG.md`, per-component docs, `crowdin.yml` |
-| Locales | 14 unused language files (kept: `en`, `pt-BR`, `context.json`) |
-| Dependencies | `vtex.search-page-context`, `vtex.structured-data`, `vtex.product-specification-badges` |
-| Utilities | `compose.ts` (unreferenced) |
 
-**Renamed/refactored:** Core shelf components prefixed with `SkuSummary*` (e.g. `SkuSummaryCustom`, `SkuSummaryImage`, `SkuSummaryName`).
+| Category        | Items                                                                                     |
+| --------------- | ----------------------------------------------------------------------------------------- |
+| Product listing | `ProductSummaryList.tsx`, `list-context.product-list`, `list-context.product-list-static` |
+| Legacy          | `ProductSummaryLegacy`, `react/legacy/`                                                   |
+| Unused blocks   | SKU selector, specification badges, add-to-list, brand, description                       |
+| Tests/mocks     | `__tests__/`, `__mocks__/`                                                                |
+| Docs            | `CHANGELOG.md`, per-component docs, `crowdin.yml`                                         |
+| Locales         | 14 unused language files (kept: `en`, `pt-BR`, `context.json`)                            |
+| Dependencies    | `vtex.search-page-context`, `vtex.structured-data`, `vtex.product-specification-badges`   |
+| Utilities       | `compose.ts` (unreferenced)                                                               |
+
+
+**Renamed/refactored:** Core shelf components prefixed with `SkuSummary`* (e.g. `SkuSummaryCustom`, `SkuSummaryImage`, `SkuSummaryName`).
 
 **Status:** ✅ Implemented
 
@@ -138,6 +148,7 @@ productId → GraphQL (productsByIdentifier) → product.items[]
 ### 4. GraphQL Builder Error Fix
 
 **Problem:** `vtex link` failed with:
+
 ```
 You must provide a GraphQL Schema in graphql/schema.graphql
 ```
@@ -145,6 +156,7 @@ You must provide a GraphQL Schema in graphql/schema.graphql
 **Cause:** The `graphql` builder was declared in `manifest.json`, but the app does not expose its own GraphQL API — it only **consumes** `vtex.search-graphql`.
 
 **Solution:**
+
 - Removed `graphql` builder from `manifest.json`
 - Moved query from `graphql/productById.graphql` to `react/queries/productById.gql`
 - Updated import in `SkuSummaryList.tsx`
@@ -163,14 +175,16 @@ You must provide a GraphQL Schema in graphql/schema.graphql
 
 **Solutions:**
 
-| Issue | Fix |
-|-------|-----|
-| Missing `product-summary` interface | Migrated to dedicated `sku-summary` namespace; `sku-summary-list` allows `sku-summary` child blocks |
-| Required `ProductSummary` prop | Made `ProductSummary` optional in `SkuSummaryListWithoutQuery` — runtime injects via blocks or `ExtensionPoint` fallback |
-| Missing `@types/node` | Added `@types/node@12.12.0` to `react/package.json` (required transitively by `ts-invariant` via `react-apollo`) |
-| Stale `jest` types in tsconfig | Removed `jest` from `react/tsconfig.json` types array |
 
-> **Note:** A separate `builder-hub` error occurred when the fork still exported `product-summary.*` interfaces while the theme also depended on `vtex.product-summary` — see section 10.
+| Issue                               | Fix                                                                                                                      |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Missing `product-summary` interface | Migrated to dedicated `sku-summary` namespace; `sku-summary-list` allows `sku-summary` child blocks                      |
+| Required `ProductSummary` prop      | Made `ProductSummary` optional in `SkuSummaryListWithoutQuery` — runtime injects via blocks or `ExtensionPoint` fallback |
+| Missing `@types/node`               | Added `@types/node@12.12.0` to `react/package.json` (required transitively by `ts-invariant` via `react-apollo`)         |
+| Stale `jest` types in tsconfig      | Removed `jest` from `react/tsconfig.json` types array                                                                    |
+
+
+> **Note:** A separate `builder-hub` error occurred when the fork still exported `product-summary.`* interfaces while the theme also depended on `vtex.product-summary` — see section 10.
 
 **Status:** ✅ Resolved
 
@@ -179,6 +193,7 @@ You must provide a GraphQL Schema in graphql/schema.graphql
 ### 6. Runtime Error — `condition-layout` / `productClusters`
 
 **Problem:** Each card rendered `Error rendering extension point` with:
+
 ```
 TypeError: Cannot read properties of undefined (reading 'find')
     at productClusters ({appVendor}.condition-layout)
@@ -189,16 +204,15 @@ TypeError: Cannot read properties of undefined (reading 'find')
 **Solution:**
 
 1. **Enriched `react/queries/productById.gql`** with:
-   - `productClusters`, `clusterHighlights`, `categories`
-   - `priceRange`, `specificationGroups`, `skuSpecifications`, `releaseDate`
-
+  - `productClusters`, `clusterHighlights`, `categories`
+  - `priceRange`, `specificationGroups`, `skuSpecifications`, `releaseDate`
 2. **Defensive defaults in `expandSkusToProducts.ts`:**
-   ```ts
+  ```ts
    productClusters: product.productClusters ?? [],
    clusterHighlights: product.clusterHighlights ?? [],
    categories: product.categories ?? [],
    // ...
-   ```
+  ```
 
 **Status:** ✅ Resolved — cards render correctly with `{appVendor}.condition-layout` in the theme
 
@@ -209,10 +223,13 @@ TypeError: Cannot read properties of undefined (reading 'find')
 **Problem:** Card links pointed to the parent product PDP without pre-selecting the SKU.
 
 **Expected URL format:**
+
 ```
 /{linkText}/p?skuId={itemId}
 ```
+
 Example:
+
 ```
 https://dev1--{appVendor}.myvtex.com/rack-abra-ripado-cor-nature-3-gavetas-222cm---76907/p?skuId=76907
 ```
@@ -221,10 +238,12 @@ https://dev1--{appVendor}.myvtex.com/rack-abra-ripado-cor-nature-3-gavetas-222cm
 
 **Iterations:**
 
-| Attempt | Result |
-|---------|--------|
-| `query: { skuId }` (object) | URL became `?[object%20Object]` — VTEX `Link` expects a **string** |
-| `query: \`skuId=${skuId}\`` (string) | ✅ Correct URL generated |
+
+| Attempt                            | Result                                                             |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| `query: { skuId }` (object)        | URL became `?[object%20Object]` — VTEX `Link` expects a **string** |
+| `query: \`skuId=${skuId}` (string) | ✅ Correct URL generated                                            |
+
 
 **File modified:** `react/SkuSummaryCustom.tsx`
 
@@ -246,13 +265,16 @@ query: linkQuery,
 
 **Files modified:**
 
-| File | Change |
-|------|--------|
-| `react/SkuSummaryList.tsx` | Added `maxItems` prop; applies `slice(0, maxItems)` after `expandSkusToProductCards()` |
-| `store/contentSchemas.json` | Site Editor schema for `maxItems` (`number`, `minimum: 1`) |
-| `react/messages.ts` + `messages/en.json`, `messages/pt-BR.json`, `messages/context.json` | i18n keys for Site Editor labels (see section 11) |
+
+| File                                                                                     | Change                                                                                 |
+| ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `react/SkuSummaryList.tsx`                                                               | Added `maxItems` prop; applies `slice(0, maxItems)` after `expandSkusToProductCards()` |
+| `store/contentSchemas.json`                                                              | Site Editor schema for `maxItems` (`number`, `minimum: 1`)                             |
+| `react/messages.ts` + `messages/en.json`, `messages/pt-BR.json`, `messages/context.json` | i18n keys for Site Editor labels (see section 11)                                      |
+
 
 **Behavior:**
+
 - `maxItems` omitted or invalid → all expanded SKU cards are shown (unchanged default)
 - `maxItems: 4` → at most 4 cards, taken in catalog order after `itemsFilter` is applied
 - Limit applies to **SKU cards**, not products
@@ -285,14 +307,17 @@ query: linkQuery,
 
 **Solution:** Custom rendering in `react/SkuSummaryName.tsx` (Option B). Each field is a separate `<span>`, controlled by explicit flags in `showFieldsProps`:
 
-| Prop | Controls |
-|------|----------|
-| `showProductName` | Product title (`product.productName`) |
-| `showBrandName` | Brand (`product.brand`) |
-| `showSku` | SKU name (`product.sku.name`) |
+
+| Prop                   | Controls                              |
+| ---------------------- | ------------------------------------- |
+| `showProductName`      | Product title (`product.productName`) |
+| `showBrandName`        | Brand (`product.brand`)               |
+| `showSku`              | SKU name (`product.sku.name`)         |
 | `showProductReference` | Reference (`REF: {productReference}`) |
 
+
 **Behavior:**
+
 - All flags `false` (or no visible data) → block returns `null`
 - Any combination of `true` flags is supported (16 boolean combinations)
 - Sponsored badge still renders when applicable, independent of name fields
@@ -329,19 +354,21 @@ You're trying to reference a product-summary.shelf interface, but two or more de
 vtex.product-summary:product-summary.shelf
 ```
 
-**Cause:** The fork still exported store interfaces with the same names as `vtex.product-summary` (`product-summary`, `product-summary.shelf`, `product-summary-image`, etc.). When the theme depended on both apps, any unqualified reference to `product-summary.shelf` — including in this app's `store/blocks.json` — could not be resolved. Prefixing with `{appVendor}.sku-summary:` would work per reference, but would force the theme to qualify every block and still leave native `product-summary.*` shelves ambiguous.
+**Cause:** The fork still exported store interfaces with the same names as `vtex.product-summary` (`product-summary`, `product-summary.shelf`, `product-summary-image`, etc.). When the theme depended on both apps, any unqualified reference to `product-summary.shelf` — including in this app's `store/blocks.json` — could not be resolved. Prefixing with `{appVendor}.sku-summary:` would work per reference, but would force the theme to qualify every block and still leave native `product-summary.`* shelves ambiguous.
 
 **Goal:** Keep `{appVendor}.sku-summary` standalone so existing theme blocks that use `vtex.product-summary` remain unchanged.
 
-**Solution:** Renamed all exported interfaces to a dedicated `sku-summary-*` namespace.
+**Solution:** Renamed all exported interfaces to a dedicated `sku-summary-`* namespace.
 
-| File | Change |
-|------|--------|
-| `store/interfaces.json` | `product-summary` → `sku-summary`; `product-summary.shelf` → `sku-summary.shelf`; child blocks → `sku-summary-image`, `sku-summary-name`, etc.; `sku-summary-list` `allowed` → `["sku-summary"]` |
-| `store/blocks.json` | Default composition updated to `sku-summary.*` block names |
-| `react/ProductSummaryListWithoutQuery.tsx` | `ExtensionPoint` `id` changed from `product-summary` to `sku-summary` |
 
-**Theme impact:** Only blocks that compose `{appVendor}.sku-summary-list` need `sku-summary.*` names. Shelves, search, and other areas that use `product-summary.shelf` continue resolving to `vtex.product-summary` without changes.
+| File                                       | Change                                                                                                                                                                                           |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `store/interfaces.json`                    | `product-summary` → `sku-summary`; `product-summary.shelf` → `sku-summary.shelf`; child blocks → `sku-summary-image`, `sku-summary-name`, etc.; `sku-summary-list` `allowed` → `["sku-summary"]` |
+| `store/blocks.json`                        | Default composition updated to `sku-summary.`* block names                                                                                                                                       |
+| `react/ProductSummaryListWithoutQuery.tsx` | `ExtensionPoint` `id` changed from `product-summary` to `sku-summary`                                                                                                                            |
+
+
+**Theme impact:** Only blocks that compose `{appVendor}.sku-summary-list` need `sku-summary.`* names. Shelves, search, and other areas that use `product-summary.shelf` continue resolving to `vtex.product-summary` without changes.
 
 **Status:** ✅ Resolved
 
@@ -354,16 +381,18 @@ vtex.product-summary:product-summary.shelf
 - `React builder could not extract messages` — ~90 keys declared only as string literals in schemas and helpers; builder could not parse them statically, risking slower storefront pages
 - `Missing the following keys in "en"` — `admin/editor.productSummaryName.sponsoredBadge.title` present only in `pt-BR`
 
-**Cause:** The fork inherited a large `messages/*.json` set from `vtex.product-summary` (including unused `productSummaryList.*`, `sponsoredBadge.*`, etc.). Schemas and runtime calls referenced message IDs as plain strings instead of `defineMessages` from `react-intl`.
+**Cause:** The fork inherited a large `messages/*.json` set from `vtex.product-summary` (including unused `productSummaryList.`*, `sponsoredBadge.`*, etc.). Schemas and runtime calls referenced message IDs as plain strings instead of `defineMessages` from `react-intl`.
 
 **Solution:**
 
-| File | Change |
-|------|--------|
-| `react/messages.ts` | Central `defineMessages` for all store and Site Editor keys still in use |
-| `react/SkuSummary*.tsx`, `react/utils/displayButtonTypes.ts`, attachment list components, `SponsoredBadge.tsx` | Schemas, `formatMessage`, and `FormattedMessage` now reference `adminMessages.*.id` / `storeMessages.*.id` |
-| `messages/en.json`, `messages/pt-BR.json`, `messages/context.json` | Trimmed to ~58 keys referenced by current schemas; added `admin/editor.productSummary.displayMode.title`; synced `en` / `pt-BR` |
-| `react/components/SponsoredBadge.tsx` | Default label fixed from non-existent `store/sponsoredBadge.title` to `store/sponsored-badge.label` |
+
+| File                                                                                                           | Change                                                                                                                          |
+| -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `react/messages.ts`                                                                                            | Central `defineMessages` for all store and Site Editor keys still in use                                                        |
+| `react/SkuSummary*.tsx`, `react/utils/displayButtonTypes.ts`, attachment list components, `SponsoredBadge.tsx` | Schemas, `formatMessage`, and `FormattedMessage` now reference `adminMessages.*.id` / `storeMessages.*.id`                      |
+| `messages/en.json`, `messages/pt-BR.json`, `messages/context.json`                                             | Trimmed to ~58 keys referenced by current schemas; added `admin/editor.productSummary.displayMode.title`; synced `en` / `pt-BR` |
+| `react/components/SponsoredBadge.tsx`                                                                          | Default label fixed from non-existent `store/sponsoredBadge.title` to `store/sponsored-badge.label`                             |
+
 
 **Outcome:** Build completes without i18n warnings; message set matches the lean app scope.
 
@@ -413,7 +442,7 @@ Then normalized via `mapCatalogProductToProductSummary(product, 'FIRST_AVAILABLE
 
 ### Block Namespace
 
-All exported interfaces use the `sku-summary-*` prefix to coexist with `vtex.product-summary` in the same theme. This avoids both the indirect-dependency error ("interface not found") and the `builder-hub` ambiguity error when two apps declare the same interface name (e.g. `product-summary.shelf`). See section 10.
+All exported interfaces use the `sku-summary-`* prefix to coexist with `vtex.product-summary` in the same theme. This avoids both the indirect-dependency error ("interface not found") and the `builder-hub` ambiguity error when two apps declare the same interface name (e.g. `product-summary.shelf`). See section 10.
 
 ### i18n / Site Editor Messages
 
@@ -425,18 +454,20 @@ All exported interfaces use the `sku-summary-*` prefix to coexist with `vtex.pro
 
 ## 🐛 Bugs Fixed
 
-| # | Bug | Cause | Fix | Status |
-|---|-----|-------|-----|--------|
-| 1 | GraphQL schema required on build | `graphql` builder without `schema.graphql` | Removed builder; query lives in `react/queries/` | ✅ |
-| 2 | Interface `product-summary` not found | VTEX indirect dependency rule | Dedicated `sku-summary` block namespace | ✅ |
-| 3 | `ProductSummary` prop required | Strict TypeScript interface | Made prop optional | ✅ |
-| 4 | `@types/node` not found | Transitive dep from `react-apollo` | Added `@types/node@12.12.0` | ✅ |
-| 5 | Extension point crash on every card | `productClusters` undefined | Enriched GraphQL + defensive defaults | ✅ |
-| 6 | Card link without SKU | `query` from context ignored `skuId` | Pass `skuId=${skuId}` string to `Link` | ✅ |
-| 7 | URL `?[object Object]` | `query` passed as object | Changed to template string | ✅ |
-| 8 | Product title always shown on shelf name | `ProductName` always renders `productName` in first span | Custom rendering with `showProductName` / `showFieldsProps` | ✅ |
-| 9 | Ambiguous `product-summary.shelf` on theme link | Fork and `vtex.product-summary` both exported identical interface names | Renamed all interfaces to `sku-summary-*`; `ExtensionPoint` → `sku-summary` | ✅ |
-| 10 | React builder i18n warnings on link | Fork message keys + string literals in schemas | `react/messages.ts` with `defineMessages`; trimmed `messages/*.json` | ✅ |
+
+| #   | Bug                                             | Cause                                                                   | Fix                                                                         | Status |
+| --- | ----------------------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------ |
+| 1   | GraphQL schema required on build                | `graphql` builder without `schema.graphql`                              | Removed builder; query lives in `react/queries/`                            | ✅      |
+| 2   | Interface `product-summary` not found           | VTEX indirect dependency rule                                           | Dedicated `sku-summary` block namespace                                     | ✅      |
+| 3   | `ProductSummary` prop required                  | Strict TypeScript interface                                             | Made prop optional                                                          | ✅      |
+| 4   | `@types/node` not found                         | Transitive dep from `react-apollo`                                      | Added `@types/node@12.12.0`                                                 | ✅      |
+| 5   | Extension point crash on every card             | `productClusters` undefined                                             | Enriched GraphQL + defensive defaults                                       | ✅      |
+| 6   | Card link without SKU                           | `query` from context ignored `skuId`                                    | Pass `skuId=${skuId}` string to `Link`                                      | ✅      |
+| 7   | URL `?[object Object]`                          | `query` passed as object                                                | Changed to template string                                                  | ✅      |
+| 8   | Product title always shown on shelf name        | `ProductName` always renders `productName` in first span                | Custom rendering with `showProductName` / `showFieldsProps`                 | ✅      |
+| 9   | Ambiguous `product-summary.shelf` on theme link | Fork and `vtex.product-summary` both exported identical interface names | Renamed all interfaces to `sku-summary-`*; `ExtensionPoint` → `sku-summary` | ✅      |
+| 10  | React builder i18n warnings on link             | Fork message keys + string literals in schemas                          | `react/messages.ts` with `defineMessages`; trimmed `messages/*.json`        | ✅      |
+
 
 ---
 
@@ -448,23 +479,27 @@ All exported interfaces use the `sku-summary-*` prefix to coexist with `vtex.pro
 
 **Behavior:**
 
-| Mode | Trigger | `productId` | `itemsFilter` | `maxItems` |
-|------|---------|-------------|---------------|------------|
-| Manual | `skus` has ≥1 valid `skuId` | Ignored | Ignored | Ignored |
-| Automatic | `skus` empty + `productId` set | Used | Used | Used |
+
+| Mode      | Trigger                        | `productId` | `itemsFilter` | `maxItems` |
+| --------- | ------------------------------ | ----------- | ------------- | ---------- |
+| Manual    | `skus` has ≥1 valid `skuId`    | Ignored     | Ignored       | Ignored    |
+| Automatic | `skus` empty + `productId` set | Used        | Used          | Used       |
+
 
 **Multiple SKUs from the same product:** `expandManualSkusToProductCards()` builds an `itemId → product` lookup from the batch GraphQL response, then walks the editor array in order — each `skuId` produces its own card even when the API returns a single product entry.
 
 **Files changed:**
 
-| File | Change |
-|------|--------|
-| `store/contentSchemas.json` | `ManualSkus` array definition + `skus` on `SkuSummaryList` |
-| `react/queries/productsBySkuIds.gql` | `productsByIdentifier(field: sku, values: $skuIds)` |
-| `react/utils/expandSkusToProducts.ts` | `expandManualSkusToProductCards()` + shared `buildVirtualProductCard` |
-| `react/SkuSummaryList.tsx` | Dual-mode fetch and schema |
-| `store/interfaces.json` | Direct `$ref` to `ManualSkus` in `content.properties` (Site Editor runtime binding) |
-| `react/messages.ts` + `messages/*.json` | Site Editor labels (pt-BR / en) |
+
+| File                                    | Change                                                                              |
+| --------------------------------------- | ----------------------------------------------------------------------------------- |
+| `store/contentSchemas.json`             | `ManualSkus` array definition + `skus` on `SkuSummaryList`                          |
+| `react/queries/productsBySkuIds.gql`    | `productsByIdentifier(field: sku, values: $skuIds)`                                 |
+| `react/utils/expandSkusToProducts.ts`   | `expandManualSkusToProductCards()` + shared `buildVirtualProductCard`               |
+| `react/SkuSummaryList.tsx`              | Dual-mode fetch and schema                                                          |
+| `store/interfaces.json`                 | Direct `$ref` to `ManualSkus` in `content.properties` (Site Editor runtime binding) |
+| `react/messages.ts` + `messages/*.json` | Site Editor labels (pt-BR / en)                                                     |
+
 
 **Status:** ✅ Implemented — QA in progress (see checklist below)
 
@@ -478,10 +513,12 @@ All exported interfaces use the `sku-summary-*` prefix to coexist with `vtex.pro
 
 **Site Editor labels:**
 
-| Locale | Label |
-|--------|-------|
+
+| Locale  | Label                                |
+| ------- | ------------------------------------ |
 | `pt-BR` | Nome da lista (analytics) - opcional |
-| `en` | List name (analytics) - optional |
+| `en`    | List name (analytics) - optional     |
+
 
 **Files changed:** `messages/en.json`, `messages/pt-BR.json`
 
@@ -501,7 +538,7 @@ Use this list after `vtex link` on a workspace with the store theme.
 - [x] Each card exposes **ID do SKU** and optional **Rótulo do card**
 - [x] **ID do produto** description states it is ignored when manual SKUs exist
 - [x] **Filtro de SKUs** / **Quantidade máxima** descriptions state they apply only with Product ID
-- [ ] **Nome da lista (analytics) - opcional** appears for `listName`; leaving it empty uses default `"SKU list"`
+- [x] **Nome da lista (analytics) - opcional** appears for `listName`; leaving it empty uses default `"SKU list"`
 - [x] Saving and reopening the block preserves SKU order and values
 
 #### Modo automático (regressão)
@@ -513,49 +550,94 @@ Use this list after `vtex link` on a workspace with the store theme.
 
 #### Modo manual
 
-- [ ] 1 SKU — one card with correct image, name, price, buy button
+- [x] 1 SKU — one card with correct image, name, price, buy button
 - [x] 2+ SKUs from **different products** — one card per SKU, correct PDP link each (`?skuId=`)
 - [x] 2+ SKUs from the **same product** — one card per SKU (not deduplicated)
 - [x] Manual order in editor matches shelf left-to-right order
-- [ ] Invalid / empty `skuId` entry — skipped without breaking other cards
+- [x] Invalid / empty `skuId` entry — skipped without breaking other cards
 - [x] `productId` + manual `skus` both filled — manual list wins; product SKUs not shown
 - [x] With manual SKUs set, changing `maxItems` or `itemsFilter` has **no effect**
 
 #### Storefront / integração
 
-- [ ] Cards work with theme `condition-layout` (no extension point crash)
-- [ ] Analytics list name still fires on impression/click
-- [ ] Up to ~10 manual SKUs — acceptable load time on target page
+- [x] Cards work with theme `condition-layout` (no extension point crash)
+- [~] Analytics list name on impression/click — **deferred** (see [Analytics TODO](#analytics-listname--deferred-future-release) below); not a v1 blocker
+- [x] Up to ~10 manual SKUs — acceptable load time on target page
+
+---
+
+### Analytics (`listName`) — deferred (future release)
+
+**Decision (16/06/2026):** Shelf analytics (`listName` → impression/click) is **out of scope for v1.0**. Functional QA (cards, links, Site Editor) is complete; pixel validation deferred to a future release.
+
+**Status:** ⏸️ Deferred — not blocking publish
+
+#### Known gaps (code review)
+
+| Gap | Location | Effect |
+| --- | --- | --- |
+| No `productClick` pixel push | `SkuSummaryList` vs. `vtex.product-summary` `ProductSummaryList` | Clicks on shelf cards do not emit `vtex:productClick` with `listName` |
+| `ProductListProvider` context on PLP | `SkuSummaryCustom` → `SEND_IMPRESSION` via nearest ancestor provider | On category/PLP pages, impressions may be attributed to `Search result` instead of the configured `listName` |
+| Dedup by `productId` | `vtex.product-list-context` reducer | Multiple SKU cards from the same product yield at most one impression per list |
+| `__listName` on PDP link only | `SkuSummaryCustom` `Link` params | Affects PDP `productView` attribution, not shelf impression/click |
+
+#### TODO — implement in a future release
+
+- [ ] **Wire `productClick`** — mirror `vtex.product-summary` `ProductSummaryList`: `usePixel().push({ event: 'productClick', list, product, position })` from `SkuSummaryList` / `SkuSummaryListWithoutQuery`
+- [ ] **Isolate `ProductListProvider` on PLP** — ensure `SEND_IMPRESSION` and `useProductImpression` use this app's `listName`, not `vtex.search-result`'s provider (layout/theme nesting)
+- [ ] **SKU-level impression dedup** — evaluate dedup key by `itemId` / `cacheId` instead of `productId` when multiple cards share one product (or document as platform limitation)
+- [ ] **QA pixel validation** — on a page with only `sku-summary-list` (no search gallery): confirm `vtex:productImpression` and `vtex:productClick` with configured `listName` and correct `sku.itemId` per card; repeat on PLP with coexisting `search-result`
+- [ ] **Docs** — update `README.md` / `BLOCKS.md` with analytics behavior and PLP caveat once fixed
+
+#### Negative impact if left unfixed
+
+- **GA / GTM:** Vitrine curated SKUs cannot be measured as a distinct list (`list` dimension); clicks may be missing entirely; on PLP, showcase views may inflate **Search result** metrics
+- **Merchandising:** Hard to compare performance of manual SKU showcases vs. other shelves or justify placement changes with data
+- **PDP attribution:** `__listName` may still pass on navigation, but without shelf `productClick` the funnel impression → click → PDP is incomplete in Enhanced Ecommerce
+- **Multi-SKU same product:** Under-counting impressions when several cards share one `productId`
+
+**Does not affect:** card rendering, `?skuId=` links, buy button, `condition-layout`, manual/automatic modes, Site Editor configuration.
 
 ---
 
 ## 🔄 Pending / TODO
 
-- [ ] **QA manual SKU selection** — remaining items in checklist above (`listName` label, invalid `skuId`, storefront/integration)
-- [ ] **Publish app** — `vtex publish` after full QA sign-off on `dev1`
-- [x] **Theme dependency** — `sunhouse.sku-summary` declared in theme `manifest.json` across environments
-- [ ] **Large SKU lists (30+)** — `maxItems` covers simple shelf caps; evaluate pagination or virtualization if full lists are needed
+### Blocking v1 publish
+
+- [ ] **Publish app** — `vtex publish` after deploy QA on `dev1`
+- [ ] **Theme version** — pin/install published `sunhouse.sku-summary` version in theme `manifest.json` (all environments)
+
+### QA — complete for v1
+
+- [x] **Manual SKU selection** — Site Editor, automatic/manual modes, storefront integration (except analytics; deferred)
+- [x] **Theme dependency** — `sunhouse.sku-summary` declared in theme `manifest.json`
+- [x] **Large SKU lists (30+)** — `maxItems` covers simple shelf caps; pagination/virtualization only if full lists required later
+
+### Backlog (future releases)
+
+- [ ] **Analytics (`listName`)** — shelf impression/click + PLP context isolation + SKU-level dedup (see section above)
 - [ ] **Price simulation** — if theme enables `priceBehavior: async` on shelf, monitor N parallel simulation requests
-- [ ] **Analytics validation** — confirm product impression/click events report SKU-level data correctly
 - [ ] **Merge `property__*` query params** — if PDP deep-linking via variation properties is needed alongside `skuId`, combine both in `linkQuery`
 - [ ] **Loading/empty states** — currently returns `null` on loading/error/empty; consider skeleton or fallback UI
-- [ ] **Automated tests** — no test suite after cleanup; add unit tests for `expandSkusToProductCards` and link query building
+- [ ] **Automated tests** — unit tests for `expandSkusToProductCards`, `expandManualSkusToProductCards`, and link query building
 
 ---
 
 ## 📊 Development Report (Brief)
 
-| Metric | Value |
-|--------|-------|
-| Starting point | Full `vtex.product-summary` fork (~142 files) |
-| Final scope | Lean SKU-listing app with dedicated block namespace |
-| New core files | `SkuSummaryList`, `expandSkusToProducts`, `productById.gql` |
-| GraphQL requests | 1 per list (vs. N requests for N products) |
-| Build blockers fixed | 5 (graphql builder, interface not found, interface collision, types, node types) |
-| Runtime blockers fixed | 3 (condition-layout crash, SKU link, name field visibility) |
-| Link format | `/{linkText}/p?skuId={itemId}` |
-| Visual parity | Preserved via `sku-summary.shelf` child blocks |
-| QA status | ✅ Manual + automatic modes validated on `dev1--sunhouse.myvtex.com` (storefront/integration pending) |
+
+| Metric                 | Value                                                                                                |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| Starting point         | Full `vtex.product-summary` fork (~142 files)                                                        |
+| Final scope            | Lean SKU-listing app with dedicated block namespace                                                  |
+| New core files         | `SkuSummaryList`, `expandSkusToProducts`, `productById.gql`                                          |
+| GraphQL requests       | 1 per list (vs. N requests for N products)                                                           |
+| Build blockers fixed   | 5 (graphql builder, interface not found, interface collision, types, node types)                     |
+| Runtime blockers fixed | 3 (condition-layout crash, SKU link, name field visibility)                                          |
+| Link format            | `/{linkText}/p?skuId={itemId}`                                                                       |
+| Visual parity          | Preserved via `sku-summary.shelf` child blocks                                                       |
+| QA status              | ✅ v1 functional QA complete on `dev1`; analytics (`listName`) deferred to future release |
+
 
 ---
 
@@ -563,7 +645,8 @@ Use this list after `vtex link` on a workspace with the store theme.
 
 - [VTEX product-summary](https://github.com/vtex-apps/product-summary)
 - [VTEX product-summary-context](https://github.com/vtex-apps/product-summary-context)
-- [VTEX search-graphql — `productsByIdentifier`](https://developers.vtex.com/docs/apps/vtex.search-graphql)
+- [VTEX search-graphql — `productsByIdentifier](https://developers.vtex.com/docs/apps/vtex.search-graphql)`
 - [VTEX IO — Declaring blocks from indirect dependencies](https://vtex.io/docs/releases/2019-12-12/declaring-blocks-stemming-from-indirect-dependencies)
 - [VTEX IO Messages builder](https://developers.vtex.com/docs/guides/vtex-io-documentation-messages-builder)
 - Internal design doc: custom SKU listing feasibility analysis (chat export `cursor_chat_custom_app_for_sku_listing_in_vt.json`)
+
